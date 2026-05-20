@@ -30,7 +30,7 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/login?logout") // Sửa dòng này: Đăng xuất xong đá về trang Login kèm tham số
                 .permitAll());
         
         return http.build();
