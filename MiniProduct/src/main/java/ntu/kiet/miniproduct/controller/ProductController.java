@@ -16,6 +16,12 @@ public class ProductController {
     public ProductController(ProductRepository repo) {
         this.repo = repo;
     }
+    
+ // Mở trang đăng nhập tự thiết kế
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login"; // Mở file login.html
+    }
 
     // 1. Hiển thị danh sách sản phẩm (Trang chủ)
     @GetMapping("/")
