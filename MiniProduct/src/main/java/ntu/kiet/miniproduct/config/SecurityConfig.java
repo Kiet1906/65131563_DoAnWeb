@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/css/**", "/js/**").permitAll() // Cho phép vào trang chủ và trang login công khai
+                .requestMatchers("/", "/login", "/css/**", "/js/**", "/product-images/**", "/page/**").permitAll() // Cho phép vào trang chủ và trang login công khai
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

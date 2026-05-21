@@ -8,6 +8,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+// Import thêm thư viện phân trang và SẮP XẾP của Spring Data
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -20,90 +25,94 @@ import ntu.kiet.miniproduct.repository.ProductRepository;
 @Controller
 public class ProductController {
 
-    // Gọi Repository (người phiên dịch) vào để dùng
     private final ProductRepository repo;
 
     public ProductController(ProductRepository repo) {
         this.repo = repo;
     }
     
-    // Mở trang đăng nhập tự thiết kế
     @GetMapping("/login")
     public String loginPage() {
-        return "login"; // Mở file login.html
+        return "login"; 
     }
 
-    // 1. Hiển thị danh sách sản phẩm (Trang chủ)
+    // Trang chủ mặc định trỏ về Trang số 1
     @GetMapping("/")
     public String viewHomePage(Model model) {
-        List<Product> listProducts = repo.findAll(); // Lấy tất cả SP từ Database
-        model.addAttribute("listProducts", listProducts); // Gửi dữ liệu sang trang HTML
-        return "index"; // Mở file index.html
+        return findPaginated(1, model); 
     }
 
-    // 2. Mở trang Form để Thêm sản phẩm mới
+    // Hàm xử lý phân trang kèm SẮP XẾP TÊN từ A-Z
+    @GetMapping("/page/{pageNo}")
+    public String findPaginated(@PathVariable(value = "pageNo") int pageNo, Model model) {
+        int pageSize = 5; // Số sản phẩm trên 1 trang
+        
+        // CẬP NHẬT: Thêm Sort.by("name").ascending() để xếp theo tên từ A -> Z
+        Page<Product> page = repo.findAll(PageRequest.of(pageNo - 1, pageSize, Sort.by("name").ascending()));
+        List<Product> listProducts = page.getContent();
+        
+        // Gửi các thông số phân trang sang giao diện HTML
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalItems", page.getTotalElements());
+        model.addAttribute("listProducts", listProducts);
+        
+        return "index";
+    }
+
+    // Hàm xử lý hiển thị form thêm mới sản phẩm
     @GetMapping("/new")
     public String showNewProductForm(Model model) {
-        Product product = new Product(); // Tạo 1 sản phẩm trống
-        model.addAttribute("product", product); // Gửi sang Form để điền
-        return "form"; // Mở file form.html
+        Product product = new Product();
+        model.addAttribute("product", product); 
+        return "form"; 
     }
 
-    // 3. Nút Lưu (Khi người dùng bấm Submit trên Form có chứa file ảnh)
+    // Nút Lưu
     @PostMapping("/save")
     public String saveProduct(@ModelAttribute("product") Product product,
                               @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
         
-        // TRƯỜNG HỢP 1: NẾU NGƯỜI DÙNG CÓ CHỌN ẢNH ĐỂ TẢI LÊN
         if (!multipartFile.isEmpty()) {
-            // 1. Lấy sạch tên file ảnh (Ví dụ: iphone15.png)
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            product.setImage(fileName); // Lưu tên ảnh này vào thuộc tính của Product
-            
-            // 2. Lưu thông tin sản phẩm vào Database trước
+            product.setImage(fileName); 
             repo.save(product);
             
-            // 3. Tạo thư mục ảo "product-images" ở ngoài nếu trên máy chưa có
             String uploadDir = "product-images/";
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
             
-            // 4. Tiến hành copy file ảnh từ trình duyệt vào thư mục vừa tạo
             try (InputStream inputStream = multipartFile.getInputStream()) {
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException ioe) {
                 throw new IOException("Không thể lưu file ảnh: " + fileName, ioe);
             }
-        } 
-        // TRƯỜNG HỢP 2: KHÔNG CHỌN ẢNH (Khi bấm Sửa sản phẩm và muốn giữ lại ảnh cũ)
-        else {
+        } else {
             if (product.getId() != null) {
                 Product existingProduct = repo.findById(product.getId()).orElse(null);
                 if (existingProduct != null) {
-                    product.setImage(existingProduct.getImage()); // Lấy lại tên ảnh cũ dán vào
+                    product.setImage(existingProduct.getImage());
                 }
             }
-            repo.save(product); // Lưu cập nhật vào DB
+            repo.save(product); 
         }
 
-        return "redirect:/"; // Lưu xong thì tự động quay về trang chủ
+        return "redirect:/"; 
     }
 
-    // 4. Mở trang Form để Sửa sản phẩm (Dựa vào ID)
     @GetMapping("/edit/{id}")
     public String showEditProductForm(@PathVariable("id") Integer id, Model model) {
-        Product product = repo.findById(id).get(); // Tìm sản phẩm theo ID
-        model.addAttribute("product", product); // Gửi dữ liệu cũ sang Form
+        Product product = repo.findById(id).get(); 
+        model.addAttribute("product", product); 
         return "form"; 
     }
 
-    // 5. Xóa sản phẩm (Dựa vào ID)
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable("id") Integer id) {
-        repo.deleteById(id); // Xóa khỏi Database
-        return "redirect:/"; // Xóa xong quay về trang chủ
+        repo.deleteById(id); 
+        return "redirect:/"; 
     }
 }
