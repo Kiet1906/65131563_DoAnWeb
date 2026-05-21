@@ -1,5 +1,6 @@
 package ntu.kiet.miniproduct.entity;
 
+import jakarta.persistence.Column; // Bổ sung thư viện này
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +19,10 @@ public class Product {
     private double price;
     private int quantity;
 
+    // --- ĐÂY LÀ PHẦN MỚI THÊM VÀO ---
+    @Column(nullable = true, length = 64)
+    private String image;
+
     // BẮT BUỘC: Tạo constructor rỗng (Spring cần cái này)
     public Product() {
     }
@@ -34,4 +39,8 @@ public class Product {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    // --- ĐÂY LÀ PHẦN GET/SET CHO ẢNH MỚI THÊM VÀO ---
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }

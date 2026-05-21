@@ -46,20 +46,27 @@
         <table class="table table-bordered table-striped table-hover align-middle shadow-sm">
             <thead class="table-dark text-center">
                 <tr>
-                    <th style="width: 8%">ID</th>
+                    <th style="width: 5%">ID</th>
+                    <th style="width: 15%">Hình Ảnh</th>
                     <th>Tên Sản Phẩm</th>
                     <th style="width: 20%">Giá (VNĐ)</th>
-                    <th style="width: 15%">Số Lượng</th>
-                    <th style="width: 18%">Hành Động</th>
+                    <th style="width: 12%">Số Lượng</th>
+                    <th style="width: 15%">Hành Động</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${#lists.isEmpty(listProducts)}">
-                    <td colspan="5" class="text-center text-muted py-4">Chưa có sản phẩm nào trong hệ thống. Hãy thêm mới!</td>
+                    <td colspan="6" class="text-center text-muted py-4">Chưa có sản phẩm nào trong hệ thống. Hãy thêm mới!</td>
                 </tr>
                 
                 <tr th:each="product : ${listProducts}">
                     <td class="text-center fw-bold" th:text="${product.id}">1</td>
+                    
+                    <td class="text-center">
+                        <img th:if="${product.image != null}" th:src="@{'/product-images/' + ${product.image}}" width="80" height="80" style="object-fit: cover;" class="img-thumbnail shadow-sm" alt="Ảnh SP" />
+                        <span th:if="${product.image == null}" class="text-muted small"><i>Chưa có ảnh</i></span>
+                    </td>
+                    
                     <td class="ps-3 fw-semibold" th:text="${product.name}">Tên SP</td>
                     <td class="text-end pe-4 text-danger fw-bold" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">1,000 đ</td>
                     <td class="text-center" th:text="${product.quantity}">10</td>
