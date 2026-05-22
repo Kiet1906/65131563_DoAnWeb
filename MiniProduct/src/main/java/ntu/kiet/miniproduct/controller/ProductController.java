@@ -6,13 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 
-// Import thêm thư viện phân trang và SẮP XẾP của Spring Data
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -30,60 +28,95 @@ public class ProductController {
     public ProductController(ProductRepository repo) {
         this.repo = repo;
     }
-    
+
     @GetMapping("/login")
     public String loginPage() {
-        return "login"; 
+        return "login";
     }
 
-    // Trang chủ mặc định trỏ về Trang số 1
+    /**
+     * TRANG CHỦ: Nhận từ khóa tìm kiếm (keyword) và hướng sắp xếp (sortDir).
+     * Mặc định nếu không ai bấm gì, sortDir sẽ là "asc" (Sắp xếp A-Z).
+     */
     @GetMapping("/")
-    public String viewHomePage(Model model) {
-        return findPaginated(1, model); 
+    public String viewHomePage(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
+            Model model) {
+        // Chuyển hướng xử lý vào trang số 1
+        return findPaginated(1, keyword, sortDir, model);
     }
 
-    // Hàm xử lý phân trang kèm SẮP XẾP TÊN từ A-Z
+    /**
+     * HÀM XỬ LÝ CHÍNH: Phân trang + Tìm kiếm mờ + Sắp xếp A-Z/Z-A
+     */
     @GetMapping("/page/{pageNo}")
-    public String findPaginated(@PathVariable(value = "pageNo") int pageNo, Model model) {
+    public String findPaginated(
+            @PathVariable(value = "pageNo") int pageNo,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
+            Model model) {
+        
         int pageSize = 5; // Số sản phẩm trên 1 trang
+
+        // 1. Tạo quy tắc Sắp xếp: Nếu sortDir là "desc" thì xếp tên từ Z->A, ngược lại mặc định A->Z
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by("name").descending() : Sort.by("name").ascending();
         
-        // CẬP NHẬT: Thêm Sort.by("name").ascending() để xếp theo tên từ A -> Z
-        Page<Product> page = repo.findAll(PageRequest.of(pageNo - 1, pageSize, Sort.by("name").ascending()));
-        List<Product> listProducts = page.getContent();
+        // 2. Gộp Trang hiện tại, Kích thước trang và Quy tắc sắp xếp thành 1 đối tượng Pageable
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
         
-        // Gửi các thông số phân trang sang giao diện HTML
+        Page<Product> page;
+        
+        // 3. Xử lý Logic Tìm kiếm
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // Thuật toán tạo chuỗi tìm kiếm mờ (ví dụ: m tôm -> %m%t%ô%m%)
+            StringBuilder fuzzyPattern = new StringBuilder("%");
+            for (char c : keyword.trim().toCharArray()) {
+                if (c != ' ') {
+                    fuzzyPattern.append(c).append("%");
+                } else {
+                    fuzzyPattern.append("%");
+                }
+            }
+            String finalPattern = fuzzyPattern.toString().replaceAll("%+", "%");
+            
+            // Gọi tầng DB xử lý (Đã bao gồm cả sắp xếp trong biến pageable)
+            page = repo.searchByNameFuzzy(finalPattern, pageable);
+            model.addAttribute("keyword", keyword);
+        } else {
+            // Nếu ô tìm kiếm bỏ trống -> Lấy toàn bộ theo sắp xếp
+            page = repo.findAll(pageable);
+            model.addAttribute("keyword", "");
+        }
+
+        // 4. Trả dữ liệu hiển thị về giao diện HTML
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("totalItems", page.getTotalElements());
-        model.addAttribute("listProducts", listProducts);
-        
+        model.addAttribute("listProducts", page.getContent());
+        model.addAttribute("sortDir", sortDir); // Gửi biến này về để Select box giữ nguyên lựa chọn A-Z hoặc Z-A
+
         return "index";
     }
 
-    // Hàm xử lý hiển thị form thêm mới sản phẩm
-    @GetMapping("/new")
-    public String showNewProductForm(Model model) {
-        Product product = new Product();
-        model.addAttribute("product", product); 
-        return "form"; 
-    }
-
-    // Nút Lưu
+    /**
+     * Xử lý lưu sản phẩm (Thêm mới hoặc Cập nhật) và Upload Ảnh
+     */
     @PostMapping("/save")
-    public String saveProduct(@ModelAttribute("product") Product product,
+    public String saveProduct(@ModelAttribute("product") Product product, 
                               @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
         
-        if (!multipartFile.isEmpty()) {
+        if (multipartFile != null && !multipartFile.isEmpty()) {
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            product.setImage(fileName); 
+            product.setImage(fileName);
             repo.save(product);
-            
+
             String uploadDir = "product-images/";
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-            
+
             try (InputStream inputStream = multipartFile.getInputStream()) {
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -91,28 +124,45 @@ public class ProductController {
                 throw new IOException("Không thể lưu file ảnh: " + fileName, ioe);
             }
         } else {
+            // Cập nhật thông tin nhưng giữ nguyên ảnh cũ nếu không up ảnh mới
             if (product.getId() != null) {
                 Product existingProduct = repo.findById(product.getId()).orElse(null);
                 if (existingProduct != null) {
                     product.setImage(existingProduct.getImage());
                 }
             }
-            repo.save(product); 
+            repo.save(product);
         }
 
-        return "redirect:/"; 
+        return "redirect:/";
     }
 
+    /**
+     * Điều hướng mở biểu mẫu thêm mới sản phẩm trống.
+     */
+    @GetMapping("/showNewProductForm")
+    public String showNewProductForm(Model model) {
+        Product product = new Product();
+        model.addAttribute("product", product);
+        return "form";
+    }
+    
+    /**
+     * Tải thông tin sản phẩm hiện tại và điều hướng mở biểu mẫu chỉnh sửa.
+     */
     @GetMapping("/edit/{id}")
     public String showEditProductForm(@PathVariable("id") Integer id, Model model) {
-        Product product = repo.findById(id).get(); 
-        model.addAttribute("product", product); 
-        return "form"; 
+        Product product = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Mã sản phẩm không hợp lệ: " + id));
+        model.addAttribute("product", product);
+        return "form";
     }
-
+    
+    /**
+     * Thực hiện xóa bỏ sản phẩm ra khỏi hệ thống dựa vào mã ID.
+     */
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable("id") Integer id) {
-        repo.deleteById(id); 
-        return "redirect:/"; 
+        repo.deleteById(id);
+        return "redirect:/";
     }
 }
