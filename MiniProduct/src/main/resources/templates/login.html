@@ -4,43 +4,73 @@
     <meta charset="UTF-8">
     <title>Đăng Nhập Hệ Thống</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            background-color: #e2e8f0 !important; /* Đồng bộ nền xám để hộp đăng nhập nổi bật hẳn */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background-color: #ffffff !important;
+            border: 2px solid #94a3b8 !important; /* Viền hộp bao quanh dày dặn, sắc nét */
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .card-header-custom {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border-bottom: 2px solid #94a3b8 !important;
+        }
+        .form-control {
+            border: 2px solid #94a3b8 !important; /* Viền ô nhập liệu cực rõ ràng */
+            border-radius: 6px;
+            background-color: #ffffff !important;
+        }
+        .form-label {
+            color: #0f172a !important;
+            font-weight: 700;
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card shadow-lg mt-5">
-                <div class="card-header bg-dark text-white text-center py-3">
-                    <h4 class="mb-0">ĐĂNG NHẬP HỆ THỐNG</h4>
-                </div>
-                <div class="card-body p-4">
-                    
-                    <div th:if="${param.error}" class="alert alert-danger text-center py-2">
-                        Tài khoản hoặc mật khẩu không đúng!
-                    </div>
-                    
-                    <div th:if="${param.logout}" class="alert alert-success text-center py-2">
-                        Bạn đã đăng xuất thành công.
-                    </div>
+<body>
 
-                    <form th:action="@{/login}" method="post">
-                        <div class="mb-3">
-                            <label class="form-label font-weight-bold">Tên đăng nhập:</label>
-                            <input type="text" name="username" class="form-control" placeholder="Nhập tài khoản" required autofocus/>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Mật khẩu:</label>
-                            <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required/>
-                        </div>
-                        <button type="submit" class="btn btn-dark w-100 py-2 mt-2">Đăng Nhập</button>
-                    </form>
-                </div>
-                <div class="card-footer text-center bg-white py-3">
-                    <a th:href="@{/}" class="text-muted text-decoration-none">← Quay lại trang chủ</a>
-                </div>
-            </div>
+<div class="login-card">
+    <div class="card-header card-header-custom text-center py-3">
+        <h4 class="mb-0 fw-bold">ĐĂNG NHẬP HỆ THỐNG</h4>
+    </div>
+    <div class="card-body p-4">
+        
+        <div th:if="${param.error}" class="alert alert-danger text-center py-2 fw-semibold">
+            Tài khoản hoặc mật khẩu không đúng!
         </div>
+        
+        <div th:if="${param.logout}" class="alert alert-success text-center py-2 fw-semibold">
+            Bạn đã đăng xuất thành công.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập:</label>
+                <input type="text" name="username" class="form-control" placeholder="Nhập tài khoản" required autofocus/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu:</label>
+                <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required/>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2 mt-2 fw-bold">Đăng Nhập</button>
+        </form>
+    </div>
+    <div class="text-center bg-light py-3 border-top border-secondary">
+        <a th:href="@{/}" class="text-muted text-decoration-none small fw-bold">← Quay lại trang chủ</a>
     </div>
 </div>
+
 </body>
 </html>
