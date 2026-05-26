@@ -102,9 +102,16 @@
         
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-collapse navbar-nav justify-content-end align-items-center gap-2 w-100 list-unstyled mb-0">
-                <li class="nav-item me-2">
+                <li class="nav-item me-2 mt-2 mt-lg-0">
                     <a th:href="@{/cart}" class="btn btn-outline-primary fw-bold px-3 rounded-pill position-relative shadow-sm">
                         <i class="bi bi-cart3 me-1"></i> Giỏ Hàng
+        
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light"
+                              th:if="${session.cartCount != null and session.cartCount > 0}"
+                              th:text="${session.cartCount}"
+                              style="font-size: 0.75rem; padding: 0.35em 0.65em;">
+                            0
+                        </span>
                     </a>
                 </li>
 
