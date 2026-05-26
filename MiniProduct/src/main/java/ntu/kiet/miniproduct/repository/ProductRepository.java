@@ -1,5 +1,4 @@
 package ntu.kiet.miniproduct.repository;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,11 +10,13 @@ import ntu.kiet.miniproduct.entity.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    /**
-     * Tìm kiếm mờ (Fuzzy Search) kết hợp phân trang và sắp xếp.
-     * Đối tượng Pageable truyền vào đã tự động chứa thông tin Sắp xếp (A-Z hoặc Z-A)
-     * nên câu lệnh SQL này sẽ tự động xếp đúng theo tên mà không cần code thêm SQL.
-     */
-    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(:keyword)")
-    Page<Product> searchByNameFuzzy(@Param("keyword") String keyword, Pageable pageable);
+/**
+* THÊM MỚI: Thuật toán lọc kép kết hợp Tìm kiếm mờ + Lọc theo Hãng sản xuất + Phân trang sắp xếp.
+* Nếu categoryId là null, điều kiện (:categoryId IS NULL) sẽ đúng và bỏ qua bộ lọc hãng.
+*/
+@Query("SELECT p FROM Product p WHERE (:categoryId IS NULL OR p.category.id = :categoryId) AND LOWER(p.name) LIKE LOWER(:keyword)")
+Page<Product> searchByCategoryAndNameFuzzy(
+@Param("categoryId") Integer categoryId,
+@Param("keyword") String keyword,
+Pageable pageable);
 }

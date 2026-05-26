@@ -24,42 +24,64 @@
             background-color: #ffffff;
             border: none;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
-        .table-custom th, .table-custom td {
-            border: 1px solid #cbd5e1 !important;
+        .table-custom th {
+            background-color: #f8fafc !important;
+            color: #475569;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .table-custom td {
             vertical-align: middle;
         }
-        .table-custom thead th {
-            background-color: #f8fafc !important;
-            color: #334155;
-            font-weight: 600;
+        .product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .badge-stock {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+        .sidebar-category .list-group-item.active {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light navbar-custom mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold fs-4" href="/">📱 PhoneStore Pro</a>
-        
-        <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav align-items-center">
-                <li class="nav-item me-2" sec:authorize="!isAuthenticated()">
-    				<a th:href="@{/register}" class="btn btn-outline-primary btn-sm px-3 fw-bold">Đăng Ký</a>
-				</li>
-                <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/login}" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm">Đăng Nhập</a>
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top mb-4">
+    <div class="container bg-white py-1">
+        <a class="navbar-brand fw-bold fs-4" th:href="@{/}">
+            <i class="bi bi-phone-fill me-2"></i>PhoneStore
+        </a>
+        <button class="navbar-toggler" type="text" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item me-3" sec:authorize="isAuthenticated()">
+                    <span class="text-secondary fw-semibold">
+                        <i class="bi bi-person-circle me-1 text-primary"></i>
+                        Xin chào, <span class="text-dark" sec:authentication="name">User</span>!
+                    </span>
+                    <span class="badge bg-info ms-1" sec:authentication="principal.authorities">Role</span>
                 </li>
-                
-                <li class="nav-item me-3 text-secondary small" sec:authorize="isAuthenticated()">
-                    <span>Xin chào, <strong class="text-dark" sec:authentication="name">User</strong>!</span>
-                    <span class="badge bg-primary ms-1" sec:authentication="principal.authorities">[ROLE]</span>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="btn btn-outline-primary fw-bold px-3" th:href="@{/login}">Đăng nhập</a>
                 </li>
-                
                 <li class="nav-item" sec:authorize="isAuthenticated()">
                     <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="btn btn-outline-danger btn-sm px-3 fw-medium">Đăng Xuất</button>
+                        <button type="submit" class="btn btn-danger fw-bold px-3">
+                            <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
+                        </button>
                     </form>
                 </li>
             </ul>
@@ -67,101 +89,155 @@
     </div>
 </nav>
 
-<div class="container my-4">
-    <div class="card card-custom p-4">
-        
-        <h2 class="text-center fw-bold text-dark mb-4">HỆ THỐNG QUẢN LÝ ĐIỆN THOẠI DI ĐỘNG</h2>
-
-        <div th:if="${message != null}" class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert" id="successAlert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <strong th:text="${message}">Thông báo</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
-        <div class="row g-3 align-items-center mb-4 justify-content-between">
-            <div class="col-md-4">
-                <div class="input-group shadow-sm">
-                    <span class="input-group-text bg-white border-end-0 text-muted">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" id="searchInput" th:value="${keyword}" placeholder="Tìm kiếm tên điện thoại..." class="form-control border-start-0 py-2" autofocus>
+<div class="container mb-5">
+    
+    <div class="card card-custom p-3 mb-4 bg-white">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="searchInput" th:value="${keyword}" class="form-control border-start-0 bg-light" placeholder="Nhập tên điện thoại cần tìm...">
                 </div>
             </div>
-            
-            <div class="col-md-3">
-                <select id="sortSelect" class="form-select shadow-sm py-2">
-                    <option value="asc" th:selected="${sortDir == 'asc' || sortDir == null}">Sắp xếp: Tên A - Z</option>
-                    <option value="desc" th:selected="${sortDir == 'desc'}">Sắp xếp: Tên Z - A</option>
-                </select>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <label class="input-group-text bg-light text-secondary fw-semibold" for="sortSelect">Sắp xếp tên:</label>
+                    <select id="sortSelect" class="form-select bg-light">
+                        <option value="asc" th:selected="${sortDir == 'asc'}">Từ A đến Z (Tăng dần)</option>
+                        <option value="desc" th:selected="${sortDir == 'desc'}">Từ Z đến về A (Giảm dần)</option>
+                    </select>
+                </div>
             </div>
-            
-            <div class="col-md-3 text-end" sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/showNewProductForm}" class="btn btn-success fw-bold px-4 py-2 shadow-sm">+ Thêm Điện Thoại</a>
+            <div class="col-md-3 text-md-end" sec:authorize="hasAuthority('ROLE_ADMIN')">
+                <a th:href="@{/showNewProductForm}" class="btn btn-primary fw-bold w-100 py-2 shadow-sm">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Thêm Điện Thoại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${param.success}" id="successAlert" class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong th:text="${param.success}">Thông báo hệ thống!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row">
+        
+        <div class="col-md-3 mb-4">
+            <div class="card card-custom sidebar-category overflow-hidden">
+                <div class="card-header bg-primary text-white fw-bold py-3">
+                    <i class="bi bi-tags-fill me-2"></i> HÃNG ĐIỆN THOẠI
+                </div>
+                <div class="list-group list-group-flush">
+                    <a th:href="@{/page/1(keyword=${keyword}, sortDir=${sortDir})}" 
+                       class="list-group-item list-group-item-action fw-semibold py-3 px-4 text-secondary"
+                       th:classappend="${selectedCategoryId == null} ? 'active text-white' : ''">
+                        <i class="bi bi-grid-fill me-2"></i> Tất cả sản phẩm
+                    </a>
+                    <a th:each="cat : ${listCategories}"
+                       th:href="@{/page/1(keyword=${keyword}, sortDir=${sortDir}, categoryId=${cat.id})}" 
+                       class="list-group-item list-group-item-action fw-semibold py-3 px-4 text-secondary"
+                       th:classappend="${selectedCategoryId == cat.id} ? 'active text-white' : ''">
+                        <i class="bi bi-phone me-2"></i> <span th:text="${cat.name}">Tên Hãng</span>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover table-custom m-0 text-center">
-                <thead>
-                    <tr>
-                        <th style="width: 80px;">STT</th>
-                        <th style="width: 100px;">Hình Ảnh</th>
-                        <th>Tên Điện Thoại</th>
-                        <th>Giá Bán (VNĐ)</th>
-                        <th>Số Lượng Kho</th>
-                        <th style="width: 160px;" sec:authorize="hasRole('ADMIN')">Hành Động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="product, rowStat : ${listProducts}">
-                        <td class="fw-bold text-secondary" th:text="${(currentPage - 1) * 5 + rowStat.count}">1</td>
-                        
-                        <td>
-                            <img th:if="${product.image != null}" th:src="@{'/product-images/' + ${product.image}}" width="55" height="55" class="img-thumbnail shadow-sm" alt="product">
-                            <img th:unless="${product.image != null}" th:src="@{/product-images/default.png}" width="55" height="55" class="img-thumbnail shadow-sm" alt="default">
-                        </td>
-                        
-                        <td th:text="${product.name}" class="fw-bold text-start text-dark">Tên điện thoại</td>
-                        <td class="text-danger fw-bold" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
-                        <td th:text="${product.quantity}" class="fw-medium">0</td>
-                        
-                        <td sec:authorize="hasRole('ADMIN')">
-                            <a th:href="@{'/edit/' + ${product.id}}" class="btn btn-warning btn-sm me-1 fw-semibold shadow-sm">Sửa</a>
-                            <a th:href="@{'/delete/' + ${product.id}}" class="btn btn-danger btn-sm fw-semibold shadow-sm" 
-                               onclick="return confirm('Bạn có chắc chắn muốn xóa điện thoại này không?');">Xóa</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div class="col-md-9">
+            <div class="card card-custom p-4 bg-white">
+                <div class="table-responsive">
+                    <table class="table table-hover table-custom align-middle m-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 8%;">Hình Ảnh</th>
+                                <th style="width: 27%;">Tên Sản Phẩm</th>
+                                <th style="width: 15%;">Hãng Sản Xuất</th>
+                                <th style="width: 15%;" class="text-end">Giá Bán</th>
+                                <th style="width: 15%;" class="text-center">Kho Hàng</th>
+                                <th style="width: 20%;" class="text-center" sec:authorize="hasAuthority('ROLE_ADMIN')">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="product : ${listProducts}">
+                                <td>
+                                    <img th:src="${product.image != null && product.image != ''} ? '/product-images/' + ${product.image} : 'https://placehold.co/60x60?text=No+Image'" 
+                                         class="product-img shadow-sm" alt="Ảnh sản phẩm">
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark fs-6" th:text="${product.name}">Tên sản phẩm</div>
+                                    <small class="text-muted">Mã số: #[[${product.id}]]</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary fw-semibold px-2 py-1" 
+                                          th:text="${product.category != null} ? ${product.category.name} : 'Chưa phân loại'">
+                                        Hãng
+                                    </span>
+                                </td>
+                                <td class="text-end fw-bold text-primary fs-6">
+                                    <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+                                </td>
+                                <td class="text-center">
+                                    <span th:if="${product.quantity > 0}" class="badge bg-success-subtle text-success badge-stock fw-bold">
+                                        <i class="bi bi-boxes me-1"></i> Còn hàng ([[${product.quantity}]])
+                                    </span>
+                                    <span th:if="${product.quantity <= 0}" class="badge bg-danger-subtle text-danger badge-stock fw-bold">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Hết hàng
+                                    </span>
+                                </td>
+                                <td class="text-center" sec:authorize="hasAuthority('ROLE_ADMIN')">
+                                    <div class="btn-group shadow-sm">
+                                        <a th:href="@{'/edit/' + ${product.id}}" class="btn btn-sm btn-outline-warning fw-bold px-3">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </a>
+                                        <a th:href="@{'/delete/' + ${product.id}}" 
+                                           class="btn btn-sm btn-outline-danger fw-bold px-3"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')">
+                                            <i class="bi bi-trash3-fill"></i> Xóa
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(listProducts)}">
+                                <td colspan="6" class="text-center py-5 text-muted fw-semibold">
+                                    <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
+                                    Không tìm thấy chiếc điện thoại nào phù hợp với bộ lọc hiện tại!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-        <div th:if="${totalPages > 1}" class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-            <div class="text-muted small fw-medium">
-                Tổng cộng: <strong class="text-dark" th:text="${totalItems}">0</strong> điện thoại
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top" th:if="${totalPages > 0}">
+                    <div class="text-secondary small fw-semibold">
+                        Hiển thị trang <span class="text-dark">[[${currentPage}]]</span> / [[${totalPages}]] (Tổng cộng [[${totalItems}]] sản phẩm)
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm m-0 shadow-sm">
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{'/page/' + ${currentPage - 1}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${selectedCategoryId})}">Trước</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${currentPage == i} ? 'active'">
+                                <a class="page-link fw-bold" th:href="@{'/page/' + ${i}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${selectedCategoryId})}">[[${i}]]</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link" th:href="@{'/page/' + ${currentPage + 1}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${selectedCategoryId})}">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
             </div>
-            
-            <nav aria-label="Page navigation">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                        <a class="page-link border-secondary text-dark" th:href="@{'/page/' + ${currentPage - 1}(keyword=${keyword}, sortDir=${sortDir})}">Trước</a>
-                    </li>
-                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${currentPage == i} ? 'active'">
-                        <a class="page-link border-secondary" th:href="@{'/page/' + ${i}(keyword=${keyword}, sortDir=${sortDir})}" th:text="${i}">1</a>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                        <a class="page-link border-secondary text-dark" th:href="@{'/page/' + ${currentPage + 1}(keyword=${keyword}, sortDir=${sortDir})}">Sau</a>
-                    </li>
-                </ul>
-            </nav>
         </div>
-
+        
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Tự động tắt thông báo sau 3 giây
+    // Tự động ẩn thông báo tác vụ thành công sau 3 giây
     setTimeout(function() {
         let alertElement = document.getElementById('successAlert');
         if (alertElement) {
@@ -170,16 +246,25 @@
         }
     }, 3000);
 
-    // Xử lý bộ lọc tìm kiếm và sắp xếp kết hợp phân trang
+    // KHỐI JAVASCRIPT XỬ LÝ ĐỒNG BỘ: TÌM KIẾM + SẮP XẾP + GIỮ NGUYÊN DANH MỤC HIỆN TẠI
     let typingTimer;                
-    let doneTypingInterval = 500;   
+    let doneTypingInterval = 500; // Đợi gõ phím xong 0.5s mới gửi request (Tránh reload liên tục)   
     let searchInput = document.getElementById('searchInput');
     let sortSelect = document.getElementById('sortSelect');
 
     function sendRequest() {
         let keyword = searchInput.value.trim();
         let sortDir = sortSelect.value;
-        window.location.href = '/page/1?keyword=' + encodeURIComponent(keyword) + '&sortDir=' + sortDir;
+        
+        // Đọc tham số categoryId từ URL hiện tại để không bị mất bộ lọc hãng khi tìm kiếm hoặc sắp xếp
+        const urlParams = new URLSearchParams(window.location.search);
+        let categoryId = urlParams.get('categoryId') || '';
+        
+        let url = '/page/1?keyword=' + encodeURIComponent(keyword) + '&sortDir=' + sortDir;
+        if (categoryId !== '') {
+            url += '&categoryId=' + categoryId;
+        }
+        window.location.href = url;
     }
 
     searchInput.addEventListener('keyup', function () {
@@ -190,11 +275,7 @@
     sortSelect.addEventListener('change', function () {
         sendRequest();
     });
-
-    if (searchInput.value.length > 0) {
-        searchInput.selectionStart = searchInput.selectionEnd = searchInput.value.length;
-    }
 </script>
-
 </body>
 </html>
+ 

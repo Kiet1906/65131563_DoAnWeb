@@ -1,11 +1,13 @@
 package ntu.kiet.miniproduct.entity;
 
-import jakarta.persistence.Column; // Bổ sung thư viện này
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name = "products") // Tên bảng trong database sẽ là products
@@ -19,9 +21,13 @@ public class Product {
     private double price;
     private int quantity;
 
-    // --- ĐÂY LÀ PHẦN MỚI THÊM VÀO ---
     @Column(nullable = true, length = 64)
     private String image;
+
+    // THÊM MỚI: Thiết lập mối quan hệ Nhiều-Một (Many-to-One) đến bảng Category
+    @ManyToOne
+    @JoinColumn(name = "category_id") // Tạo cột khóa ngoại category_id trong bảng products
+    private Category category;
 
     // BẮT BUỘC: Tạo constructor rỗng (Spring cần cái này)
     public Product() {
@@ -40,7 +46,10 @@ public class Product {
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    // --- ĐÂY LÀ PHẦN GET/SET CHO ẢNH MỚI THÊM VÀO ---
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
+
+    // THÊM MỚI: Getter và Setter cho đối tượng Category phục vụ liên kết danh mục
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 }
