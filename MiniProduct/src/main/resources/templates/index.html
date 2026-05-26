@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Hệ Thống Quản Lý Sản Phẩm</title>
+    <title>Hệ Thống Quản Lý Cửa Hàng Điện Thoại</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -41,10 +41,13 @@
 
 <nav class="navbar navbar-expand-lg navbar-light navbar-custom mb-4">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-4" href="/">🛒 MiniProduct Pro</a>
+        <a class="navbar-brand fw-bold fs-4" href="/">📱 PhoneStore Pro</a>
         
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav align-items-center">
+                <li class="nav-item me-2" sec:authorize="!isAuthenticated()">
+    				<a th:href="@{/register}" class="btn btn-outline-primary btn-sm px-3 fw-bold">Đăng Ký</a>
+				</li>
                 <li class="nav-item" sec:authorize="!isAuthenticated()">
                     <a th:href="@{/login}" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm">Đăng Nhập</a>
                 </li>
@@ -67,7 +70,13 @@
 <div class="container my-4">
     <div class="card card-custom p-4">
         
-        <h2 class="text-center fw-bold text-dark mb-4">HỆ THỐNG QUẢN LÝ SẢN PHẨM</h2>
+        <h2 class="text-center fw-bold text-dark mb-4">HỆ THỐNG QUẢN LÝ ĐIỆN THOẠI DI ĐỘNG</h2>
+
+        <div th:if="${message != null}" class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert" id="successAlert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong th:text="${message}">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
         <div class="row g-3 align-items-center mb-4 justify-content-between">
             <div class="col-md-4">
@@ -75,7 +84,7 @@
                     <span class="input-group-text bg-white border-end-0 text-muted">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" id="searchInput" th:value="${keyword}" placeholder="Tìm kiếm tên sản phẩm..." class="form-control border-start-0 py-2" autofocus>
+                    <input type="text" id="searchInput" th:value="${keyword}" placeholder="Tìm kiếm tên điện thoại..." class="form-control border-start-0 py-2" autofocus>
                 </div>
             </div>
             
@@ -87,7 +96,7 @@
             </div>
             
             <div class="col-md-3 text-end" sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/showNewProductForm}" class="btn btn-success fw-bold px-4 py-2 shadow-sm">+ Thêm Sản Phẩm</a>
+                <a th:href="@{/showNewProductForm}" class="btn btn-success fw-bold px-4 py-2 shadow-sm">+ Thêm Điện Thoại</a>
             </div>
         </div>
 
@@ -97,7 +106,7 @@
                     <tr>
                         <th style="width: 80px;">STT</th>
                         <th style="width: 100px;">Hình Ảnh</th>
-                        <th>Tên Sản Phẩm</th>
+                        <th>Tên Điện Thoại</th>
                         <th>Giá Bán (VNĐ)</th>
                         <th>Số Lượng Kho</th>
                         <th style="width: 160px;" sec:authorize="hasRole('ADMIN')">Hành Động</th>
@@ -112,14 +121,14 @@
                             <img th:unless="${product.image != null}" th:src="@{/product-images/default.png}" width="55" height="55" class="img-thumbnail shadow-sm" alt="default">
                         </td>
                         
-                        <td th:text="${product.name}" class="fw-bold text-start text-dark">Tên sản phẩm</td>
+                        <td th:text="${product.name}" class="fw-bold text-start text-dark">Tên điện thoại</td>
                         <td class="text-danger fw-bold" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
                         <td th:text="${product.quantity}" class="fw-medium">0</td>
                         
                         <td sec:authorize="hasRole('ADMIN')">
                             <a th:href="@{'/edit/' + ${product.id}}" class="btn btn-warning btn-sm me-1 fw-semibold shadow-sm">Sửa</a>
                             <a th:href="@{'/delete/' + ${product.id}}" class="btn btn-danger btn-sm fw-semibold shadow-sm" 
-                               onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">Xóa</a>
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa điện thoại này không?');">Xóa</a>
                         </td>
                     </tr>
                 </tbody>
@@ -128,7 +137,7 @@
 
         <div th:if="${totalPages > 1}" class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
             <div class="text-muted small fw-medium">
-                Tổng cộng: <strong class="text-dark" th:text="${totalItems}">0</strong> sản phẩm
+                Tổng cộng: <strong class="text-dark" th:text="${totalItems}">0</strong> điện thoại
             </div>
             
             <nav aria-label="Page navigation">
@@ -149,32 +158,39 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+    // Tự động tắt thông báo sau 3 giây
+    setTimeout(function() {
+        let alertElement = document.getElementById('successAlert');
+        if (alertElement) {
+            let bsAlert = new bootstrap.Alert(alertElement);
+            bsAlert.close();
+        }
+    }, 3000);
+
+    // Xử lý bộ lọc tìm kiếm và sắp xếp kết hợp phân trang
     let typingTimer;                
     let doneTypingInterval = 500;   
     let searchInput = document.getElementById('searchInput');
     let sortSelect = document.getElementById('sortSelect');
 
-    // Hàm gộp chung hành động gửi dữ liệu lên Server
     function sendRequest() {
         let keyword = searchInput.value.trim();
         let sortDir = sortSelect.value;
-        // Gửi đồng thời cả từ khóa và hướng sắp xếp về trang 1
         window.location.href = '/page/1?keyword=' + encodeURIComponent(keyword) + '&sortDir=' + sortDir;
     }
 
-    // Sự kiện gõ phím ô tìm kiếm (sau khi dừng gõ 0.5 giây sẽ tự chạy)
     searchInput.addEventListener('keyup', function () {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(sendRequest, doneTypingInterval);
     });
 
-    // Sự kiện khi người dùng đổi lựa chọn A-Z hoặc Z-A (Chạy ngay lập tức không cần chờ)
     sortSelect.addEventListener('change', function () {
         sendRequest();
     });
 
-    // Giữ con trỏ chuột đứng ở cuối chữ ô tìm kiếm
     if (searchInput.value.length > 0) {
         searchInput.selectionStart = searchInput.selectionEnd = searchInput.value.length;
     }

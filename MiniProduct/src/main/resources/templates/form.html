@@ -2,83 +2,71 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Cập Nhật Sản Phẩm</title>
+    <title>Cập Nhật Điện Thoại</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
-            background-color: #e2e8f0 !important; /* Đồng bộ nền xám đậm nổi bật form trắng */
+            background-color: #e2e8f0 !important; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .modern-card {
             background-color: #ffffff !important;
-            border: 2px solid #94a3b8 !important; /* Bao khung viền xám đậm cực kỳ rõ nét */
+            border: none;
             border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
         .card-header-custom {
             background-color: #0d6efd !important;
             color: #ffffff !important;
-            border-bottom: 2px solid #94a3b8 !important;
-        }
-        .form-control {
-            border: 2px solid #94a3b8 !important; /* Đậm nét đường viền ô nhập liệu để không bị mờ nhạt */
-            border-radius: 6px;
-            background-color: #ffffff !important;
-        }
-        .form-control:focus {
-            border-color: #0d6efd !important;
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2) !important;
-        }
-        .form-label {
-            color: #0f172a !important;
-            font-weight: 700;
         }
     </style>
 </head>
-<body>
-<div class="container mt-5">
+<body class="d-flex align-items-center min-vh-100">
+
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-6 col-lg-5">
             <div class="card modern-card">
                 <div class="card-header card-header-custom text-center py-3">
-                    <h3 class="mb-0 fw-bold">Thông Tin Sản Phẩm</h3>
+                    <h4 class="mb-0 fw-bold">THÔNG TIN ĐIỆN THOẠI</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form action="#" th:action="@{/save}" th:object="${product}" method="post" enctype="multipart/form-data">
-                        
+                    
+                    <form th:action="@{/save}" th:object="${product}" method="post" enctype="multipart/form-data">
                         <input type="hidden" th:field="*{id}" />
-                        <input type="hidden" th:field="*{image}" />
 
                         <div class="mb-3">
-                            <label class="form-label">Tên Sản Phẩm:</label>
-                            <input type="text" th:field="*{name}" class="form-control" placeholder="Nhập tên sản phẩm" required />
+                            <label class="form-label fw-semibold text-secondary">Tên Điện Thoại:</label>
+                            <input type="text" th:field="*{name}" class="form-control" placeholder="Ví dụ: iPhone 15 Pro Max" required />
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Giá (VNĐ):</label>
+                            <label class="form-label fw-semibold text-secondary">Giá Bán (VNĐ):</label>
                             <input type="number" th:field="*{price}" class="form-control" placeholder="Nhập giá tiền" required />
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Số Lượng:</label>
+                            <label class="form-label fw-semibold text-secondary">Số Lượng Kho:</label>
                             <input type="number" th:field="*{quantity}" class="form-control" placeholder="Nhập số lượng" required />
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label text-primary">Ảnh Sản Phẩm (Tùy chọn):</label>
+                            <label class="form-label fw-semibold text-primary">Ảnh Minh Họa (Tùy chọn):</label>
                             <input type="file" name="imageFile" accept="image/png, image/jpeg, image/webp" class="form-control" />
                         </div>
 
                         <div class="text-center pt-2">
-                            <button type="submit" class="btn btn-primary px-4 fw-bold me-2">Lưu Sản Phẩm</button>
-                            <a th:href="@{/}" class="btn btn-secondary px-4 fw-bold">Hủy Bỏ</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold me-2 shadow-sm">Lưu Dữ Liệu</button>
+                            <a th:href="@{/}" class="btn btn-secondary px-4 fw-bold shadow-sm">Hủy Bỏ</a>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>

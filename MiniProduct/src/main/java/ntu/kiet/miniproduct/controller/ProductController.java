@@ -49,10 +49,11 @@ public class ProductController {
 
     /**
      * HÀM XỬ LÝ CHÍNH: Phân trang + Tìm kiếm mờ + Sắp xếp A-Z/Z-A
+     * Đã dọn sạch thuộc tính trùng lặp ở @PathVariable để xóa Cảnh báo IDE
      */
     @GetMapping("/page/{pageNo}")
     public String findPaginated(
-            @PathVariable(value = "pageNo") int pageNo,
+            @PathVariable int pageNo, 
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
             Model model) {
@@ -149,9 +150,10 @@ public class ProductController {
     
     /**
      * Tải thông tin sản phẩm hiện tại và điều hướng mở biểu mẫu chỉnh sửa.
+     * Đã dọn sạch thuộc tính trùng lặp ở @PathVariable để xóa Cảnh báo IDE
      */
     @GetMapping("/edit/{id}")
-    public String showEditProductForm(@PathVariable("id") Integer id, Model model) {
+    public String showEditProductForm(@PathVariable Integer id, Model model) {
         Product product = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Mã sản phẩm không hợp lệ: " + id));
         model.addAttribute("product", product);
         return "form";
@@ -159,9 +161,10 @@ public class ProductController {
     
     /**
      * Thực hiện xóa bỏ sản phẩm ra khỏi hệ thống dựa vào mã ID.
+     * Đã dọn sạch thuộc tính trùng lặp ở @PathVariable để xóa Cảnh báo IDE
      */
     @GetMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable("id") Integer id) {
+    public String deleteProduct(@PathVariable Integer id) {
         repo.deleteById(id);
         return "redirect:/";
     }

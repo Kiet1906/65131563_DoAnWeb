@@ -10,28 +10,35 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    // Khai báo công cụ mã hóa mật khẩu chuẩn BCrypt
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/css/**", "/js/**", "/product-images/**", "/page/**").permitAll() // Cho phép vào trang chủ và trang login công khai
+                // 1. Cho phép TẤT CẢ mọi người (Khách & User) truy cập các trang công khai và tài nguyên tĩnh
+                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/product-images/**", "/page/**").permitAll()
+                
+                // 2. CHỈ ADMIN (ROLE_ADMIN) mới có quyền truy cập các đường dẫn CRUD
+                // Spring Security tự động hiểu hasRole("ADMIN") là kiểm tra quyền "ROLE_ADMIN" trong DB
+                .requestMatchers("/showNewProductForm", "/save", "/edit/**", "/delete/**").hasRole("ADMIN")
+                
+                // 3. Các yêu cầu còn lại (nếu có) bắt buộc phải đăng nhập
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login") // Chỉ định đường dẫn trang login tự thiết kế
-                .defaultSuccessUrl("/", true) // Đăng nhập xong thì đá về trang chủ
+                .loginPage("/login")               // Trang đăng nhập tự chế
+                .defaultSuccessUrl("/", true)      // Đăng nhập thành công thì về trang chủ
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout") // Sửa dòng này: Đăng xuất xong đá về trang Login kèm tham số
-                .permitAll());
+                .logoutSuccessUrl("/login?logout") // Đăng xuất xong đá về trang login kèm thông báo
+                .permitAll()
+            );
         
         return http.build();
     }
