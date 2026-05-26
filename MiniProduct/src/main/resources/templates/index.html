@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         html, body {
-            background-color: #e2e8f0 !important; 
+            background-color: #f1f5f9 !important; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #1e293b;
         }
         .navbar-custom {
             background-color: #ffffff !important;
             border-bottom: 3px solid #0d6efd !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .navbar-brand {
             color: #0d6efd !important;
@@ -23,221 +23,265 @@
         .card-custom {
             background-color: #ffffff;
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .table-custom th {
-            background-color: #f8fafc !important;
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        .sidebar-sticky {
+            background-color: #ffffff;
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+        .list-group-item-custom {
+            border: none;
+            border-radius: 8px !important;
+            margin-bottom: 4px;
+            padding: 12px 16px;
             color: #475569;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
-        .table-custom td {
-            vertical-align: middle;
+        .list-group-item-custom:hover {
+            background-color: #f8fafc;
+            color: #0d6efd;
+            padding-left: 22px;
+        }
+        .list-group-item-custom.active {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
+        }
+        .product-img-container {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            overflow: hidden;
+            border-bottom: 1px solid #f1f5f9;
         }
         .product-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            max-height: 180px;
+            max-width: 90%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
         }
-        .badge-stock {
-            font-size: 0.85rem;
-            padding: 6px 12px;
-            border-radius: 30px;
+        .card-custom:hover .product-img {
+            transform: scale(1.06);
         }
-        .sidebar-category .list-group-item.active {
+        .page-link-custom {
+            border: none;
+            border-radius: 8px !important;
+            margin: 0 3px;
+            color: #475569;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .page-item.active .page-link-custom {
             background-color: #0d6efd !important;
-            border-color: #0d6efd !important;
+            color: #ffffff !important;
         }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-<nav class="navbar navbar-expand-lg navbar-custom sticky-top mb-4">
-    <div class="container bg-white py-1">
-        <a class="navbar-brand fw-bold fs-4" th:href="@{/}">
-            <i class="bi bi-phone-fill me-2"></i>PhoneStore
+<nav class="navbar navbar-expand-lg navbar-custom py-3 sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" th:href="@{/}">
+            <i class="bi bi-phone-vibrate-fill text-primary me-1"></i> PhoneStore
         </a>
-        <button class="navbar-toggler" type="text" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
+        
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item me-3" sec:authorize="isAuthenticated()">
-                    <span class="text-secondary fw-semibold">
-                        <i class="bi bi-person-circle me-1 text-primary"></i>
-                        Xin chào, <span class="text-dark" sec:authentication="name">User</span>!
-                    </span>
-                    <span class="badge bg-info ms-1" sec:authentication="principal.authorities">Role</span>
+            <ul class="navbar-collapse navbar-nav justify-content-end align-items-center gap-2 w-100 list-unstyled mb-0">
+                <li class="nav-item me-2">
+                    <a th:href="@{/cart}" class="btn btn-outline-primary fw-bold px-3 rounded-pill position-relative shadow-sm">
+                        <i class="bi bi-cart3 me-1"></i> Giỏ Hàng
+                    </a>
                 </li>
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="btn btn-outline-primary fw-bold px-3" th:href="@{/login}">Đăng nhập</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="btn btn-danger fw-bold px-3">
-                            <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
-                        </button>
-                    </form>
-                </li>
+
+                <th:block sec:authorize="!isAuthenticated()">
+                    <li class="nav-item">
+                        <a th:href="@{/login}" class="btn btn-light fw-bold px-3 rounded-pill border">Đăng Nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:href="@{/register}" class="btn btn-primary fw-bold px-3 rounded-pill shadow-sm">Đăng Ký</a>
+                    </li>
+                </th:block>
+
+                <th:block sec:authorize="isAuthenticated()">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-dark fw-bold bg-light px-3 py-2 rounded-pill border" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle text-primary me-1"></i> Xin chào, <span sec:authentication="name" class="text-primary">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2" aria-labelledby="userDropdown">
+                            <li>
+                                <form th:action="@{/logout}" method="post" class="m-0">
+                                    <button type="submit" class="dropdown-item text-danger fw-semibold py-2">
+                                        <i class="bi bi-box-arrow-right me-1"></i> Đăng Xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </th:block>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container mb-5">
-    
-    <div class="card card-custom p-3 mb-4 bg-white">
-        <div class="row g-3 align-items-center">
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="searchInput" th:value="${keyword}" class="form-control border-start-0 bg-light" placeholder="Nhập tên điện thoại cần tìm...">
-                </div>
+<div sec:authorize="hasRole('ADMIN')" class="container mt-4 mb-2">
+    <div class="card bg-dark text-white shadow-sm rounded-4 border-0" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center p-4 gap-3">
+            <div>
+                <h4 class="fw-bold mb-1 text-warning"><i class="bi bi-speedometer2 me-2"></i> BẢNG QUẢN TRỊ ADMIN</h4>
+                <p class="mb-0 text-light opacity-75 small">Khu vực kiểm soát hệ thống: Quản lý danh mục sản phẩm, cập nhật tồn kho và giá bán lẻ.</p>
             </div>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <label class="input-group-text bg-light text-secondary fw-semibold" for="sortSelect">Sắp xếp tên:</label>
-                    <select id="sortSelect" class="form-select bg-light">
-                        <option value="asc" th:selected="${sortDir == 'asc'}">Từ A đến Z (Tăng dần)</option>
-                        <option value="desc" th:selected="${sortDir == 'desc'}">Từ Z đến về A (Giảm dần)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-3 text-md-end" sec:authorize="hasAuthority('ROLE_ADMIN')">
-                <a th:href="@{/showNewProductForm}" class="btn btn-primary fw-bold w-100 py-2 shadow-sm">
-                    <i class="bi bi-plus-circle-fill me-1"></i> Thêm Điện Thoại
+            <div>
+                <a th:href="@{/showNewProductForm}" class="btn btn-warning fw-bold px-4 py-2 shadow rounded-pill">
+                    <i class="bi bi-plus-circle-fill me-1"></i> NHẬP MÁY MỚI LÊN KỆ
                 </a>
             </div>
         </div>
     </div>
+</div>
 
-    <div th:if="${param.success}" id="successAlert" class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <strong th:text="${param.success}">Thông báo hệ thống!</strong>
+<div class="container flex-grow-1 my-4">
+    
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm border-0 rounded-3 mb-4" role="alert" id="successAlert">
+        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}">Thao tác thành công!</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <div class="row">
-        
-        <div class="col-md-3 mb-4">
-            <div class="card card-custom sidebar-category overflow-hidden">
-                <div class="card-header bg-primary text-white fw-bold py-3">
-                    <i class="bi bi-tags-fill me-2"></i> HÃNG ĐIỆN THOẠI
-                </div>
+    <div class="row g-4">
+        <div class="col-lg-3 col-md-4">
+            <div class="sidebar-sticky p-4">
+                <h5 class="fw-bold mb-3 text-secondary text-uppercase small" style="letter-spacing: 0.05em;"><i class="bi bi-funnel-fill text-primary me-1"></i> Hãng sản xuất</h5>
                 <div class="list-group list-group-flush">
                     <a th:href="@{/page/1(keyword=${keyword}, sortDir=${sortDir})}" 
-                       class="list-group-item list-group-item-action fw-semibold py-3 px-4 text-secondary"
-                       th:classappend="${selectedCategoryId == null} ? 'active text-white' : ''">
+                       class="list-group-item list-group-item-action list-group-item-custom"
+                       th:classappend="${categoryId == null || categoryId == ''} ? 'active' : ''">
                         <i class="bi bi-grid-fill me-2"></i> Tất cả sản phẩm
                     </a>
-                    <a th:each="cat : ${listCategories}"
-                       th:href="@{/page/1(keyword=${keyword}, sortDir=${sortDir}, categoryId=${cat.id})}" 
-                       class="list-group-item list-group-item-action fw-semibold py-3 px-4 text-secondary"
-                       th:classappend="${selectedCategoryId == cat.id} ? 'active text-white' : ''">
+                    <a th:each="cat : ${listCategories}" 
+                       th:href="@{/page/1(categoryId=${cat.id}, keyword=${keyword}, sortDir=${sortDir})}" 
+                       class="list-group-item list-group-item-action list-group-item-custom"
+                       th:classappend="${categoryId == cat.id} ? 'active' : ''">
                         <i class="bi bi-phone me-2"></i> <span th:text="${cat.name}">Tên Hãng</span>
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-9">
-            <div class="card card-custom p-4 bg-white">
-                <div class="table-responsive">
-                    <table class="table table-hover table-custom align-middle m-0">
-                        <thead>
-                            <tr>
-                                <th style="width: 8%;">Hình Ảnh</th>
-                                <th style="width: 27%;">Tên Sản Phẩm</th>
-                                <th style="width: 15%;">Hãng Sản Xuất</th>
-                                <th style="width: 15%;" class="text-end">Giá Bán</th>
-                                <th style="width: 15%;" class="text-center">Kho Hàng</th>
-                                <th style="width: 20%;" class="text-center" sec:authorize="hasAuthority('ROLE_ADMIN')">Thao Tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="product : ${listProducts}">
-                                <td>
-                                    <img th:src="${product.image != null && product.image != ''} ? '/product-images/' + ${product.image} : 'https://placehold.co/60x60?text=No+Image'" 
-                                         class="product-img shadow-sm" alt="Ảnh sản phẩm">
-                                </td>
-                                <td>
-                                    <div class="fw-bold text-dark fs-6" th:text="${product.name}">Tên sản phẩm</div>
-                                    <small class="text-muted">Mã số: #[[${product.id}]]</small>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary fw-semibold px-2 py-1" 
-                                          th:text="${product.category != null} ? ${product.category.name} : 'Chưa phân loại'">
-                                        Hãng
-                                    </span>
-                                </td>
-                                <td class="text-end fw-bold text-primary fs-6">
-                                    <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
-                                </td>
-                                <td class="text-center">
-                                    <span th:if="${product.quantity > 0}" class="badge bg-success-subtle text-success badge-stock fw-bold">
-                                        <i class="bi bi-boxes me-1"></i> Còn hàng ([[${product.quantity}]])
-                                    </span>
-                                    <span th:if="${product.quantity <= 0}" class="badge bg-danger-subtle text-danger badge-stock fw-bold">
-                                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Hết hàng
-                                    </span>
-                                </td>
-                                <td class="text-center" sec:authorize="hasAuthority('ROLE_ADMIN')">
-                                    <div class="btn-group shadow-sm">
-                                        <a th:href="@{'/edit/' + ${product.id}}" class="btn btn-sm btn-outline-warning fw-bold px-3">
-                                            <i class="bi bi-pencil-square"></i> Sửa
-                                        </a>
-                                        <a th:href="@{'/delete/' + ${product.id}}" 
-                                           class="btn btn-sm btn-outline-danger fw-bold px-3"
-                                           onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')">
-                                            <i class="bi bi-trash3-fill"></i> Xóa
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(listProducts)}">
-                                <td colspan="6" class="text-center py-5 text-muted fw-semibold">
-                                    <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
-                                    Không tìm thấy chiếc điện thoại nào phù hợp với bộ lọc hiện tại!
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="col-lg-9 col-md-8">
+            <div class="bg-white p-3 rounded-4 shadow-sm border-0 mb-4 d-flex flex-column flex-md-row gap-3 align-items-center justify-content-between">
+                <div class="input-group" style="max-width: 450px;">
+                    <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchInput" th:value="${keyword}" class="form-control bg-light border-start-0 rounded-end-pill py-2" placeholder="Tìm tên điện thoại cần mua...">
                 </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top" th:if="${totalPages > 0}">
-                    <div class="text-secondary small fw-semibold">
-                        Hiển thị trang <span class="text-dark">[[${currentPage}]]</span> / [[${totalPages}]] (Tổng cộng [[${totalItems}]] sản phẩm)
-                    </div>
-                    <nav>
-                        <ul class="pagination pagination-sm m-0 shadow-sm">
-                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{'/page/' + ${currentPage - 1}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${selectedCategoryId})}">Trước</a>
-                            </li>
-                            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${currentPage == i} ? 'active'">
-                                <a class="page-link fw-bold" th:href="@{'/page/' + ${i}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${selectedCategoryId})}">[[${i}]]</a>
-                            </li>
-                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                                <a class="page-link" th:href="@{'/page/' + ${currentPage + 1}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${selectedCategoryId})}">Sau</a>
-                            </li>
-                        </ul>
-                    </nav>
+                
+                <div class="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-md-end">
+                    <label class="text-muted fw-semibold small text-nowrap mb-0"><i class="bi bi-sort-down-alt me-1"></i> Sắp xếp giá:</label>
+                    <select id="sortSelect" class="form-select border rounded-pill px-3 py-2 fw-semibold text-secondary" style="width: 180px;">
+                        <option value="asc" th:selected="${sortDir == 'asc'}">Thấp đến Cao</option>
+                        <option value="desc" th:selected="${sortDir == 'desc'}">Cao đến Thấp</option>
+                    </select>
                 </div>
-
             </div>
+
+            <div th:if="${#lists.isEmpty(listProducts)}" class="text-center bg-white py-5 px-4 rounded-4 shadow-sm">
+                <i class="bi bi-exclamation-triangle text-warning display-1 d-block mb-3"></i>
+                <h4 class="fw-bold text-secondary">Không tìm thấy chiếc điện thoại nào!</h4>
+                <p class="text-muted small">Hãy thử tìm kiếm từ khóa khác hoặc bấm chọn hãng khác bên danh mục.</p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4" th:if="${!#lists.isEmpty(listProducts)}">
+                <div class="col" th:each="product : ${listProducts}">
+                    <div class="card card-custom h-100">
+                        <div class="product-img-container">
+                            <img th:if="${product.image != null && product.image != ''}" 
+                                 th:src="@{'/product-images/' + product.image}" 
+                                 class="product-img" alt="Ảnh điện thoại">
+                            <img th:if="${product.image == null || product.image == ''}" 
+                                 src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300" 
+                                 class="product-img opacity-50" alt="Ảnh trống">
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column p-4">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold rounded-pill px-2 py-1 align-self-start small mb-2" th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Hãng</span>
+                            <h5 class="card-title fw-bold text-dark mb-1 text-truncate" th:text="${product.name}">Tên sản phẩm</h5>
+                            
+                            <div class="fs-5 fw-bold text-danger mb-2">
+                                <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+                            </div>
+
+                            <div class="mb-3 small">
+                                <th:block th:if="${product.quantity > 0}">
+                                    <span class="text-success fw-semibold"><i class="bi bi-box-seam me-1"></i> Còn lại: <strong th:text="${product.quantity}">10</strong> máy</span>
+                                </th:block>
+                                <th:block th:if="${product.quantity <= 0}">
+                                    <span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i> Đã hết hàng</span>
+                                </th:block>
+                            </div>
+
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center gap-2">
+                                <div sec:authorize="hasRole('ADMIN')" class="d-flex gap-1 w-100">
+                                    <a th:href="@{'/edit/' + ${product.id}}" class="btn btn-sm btn-outline-secondary fw-semibold flex-grow-1 py-2 rounded-3"><i class="bi bi-pencil-square"></i> Sửa</a>
+                                    <a th:href="@{'/delete/' + ${product.id}}" class="btn btn-sm btn-outline-danger fw-semibold flex-grow-1 py-2 rounded-3" onclick="return confirm('Bạn chắc chắn có muốn xóa dòng máy này không?')"><i class="bi bi-trash3"></i> Xóa</a>
+                                </div>
+                                
+                                <div sec:authorize="!hasRole('ADMIN')" class="w-100">
+                                    <a th:href="@{'/cart/add/' + ${product.id}}" 
+                                       class="btn btn-primary w-100 fw-bold py-2 rounded-3 shadow-sm"
+                                       th:classappend="${product.quantity <= 0} ? 'disabled btn-secondary opacity-50' : ''">
+                                        <i class="bi bi-bag-plus-fill me-1"></i> Mua Ngay
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-5" th:if="${totalPages > 1}">
+                <nav>
+                    <ul class="pagination shadow-sm rounded-3">
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${currentPage == i} ? 'active' : ''">
+                            <a class="page-link page-link-custom py-2 px-3" 
+                               th:href="@{'/page/' + ${i}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${categoryId})}" 
+                               th:text="${i}">1</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
         </div>
-        
     </div>
 </div>
+
+<footer class="bg-white border-top mt-auto py-4 text-center text-muted shadow-sm">
+    <div class="container">
+        <h5 class="fw-bold text-primary mb-1"><i class="bi bi-phone-vibrate-fill me-1"></i> PhoneStore</h5>
+        <p class="mb-2 fw-semibold text-secondary small">Đồ án môn học - Hệ thống Thương mại Điện tử Mini.</p>
+        <div class="small border-top pt-2 opacity-90 text-secondary">
+            &copy; 2026 Bản quyền thuộc về sinh viên: <strong>[65131563_NguyenAnhKiet]</strong>.<br>
+            <span class="opacity-75 font-monospace">Phát triển hoàn chỉnh trên nền tảng Spring Boot & Thymeleaf.</span>
+        </div>
+    </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Tự động ẩn thông báo tác vụ thành công sau 3 giây
+    // Tự động ẩn thông báo thành công sau 3 giây cho gọn màn hình
     setTimeout(function() {
         let alertElement = document.getElementById('successAlert');
         if (alertElement) {
@@ -272,10 +316,11 @@
         typingTimer = setTimeout(sendRequest, doneTypingInterval);
     });
 
-    sortSelect.addEventListener('change', function () {
-        sendRequest();
+    searchInput.addEventListener('keydown', function () {
+        clearTimeout(typingTimer);
     });
+
+    sortSelect.addEventListener('change', sendRequest);
 </script>
 </body>
 </html>
- 
