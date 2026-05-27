@@ -215,7 +215,7 @@
                     <div class="card card-custom h-100">
                         <div class="product-img-container">
                             <img th:if="${product.image != null && product.image != ''}" 
-                                 th:src="@{'/product-images/' + product.image}" 
+                                 th:src="@{/product-images/{image}(image=${product.image})}" 
                                  class="product-img" alt="Ảnh điện thoại">
                             <img th:if="${product.image == null || product.image == ''}" 
                                  src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300" 
@@ -241,12 +241,12 @@
 
                             <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center gap-2">
                                 <div sec:authorize="hasRole('ADMIN')" class="d-flex gap-1 w-100">
-                                    <a th:href="@{'/edit/' + ${product.id}}" class="btn btn-sm btn-outline-secondary fw-semibold flex-grow-1 py-2 rounded-3"><i class="bi bi-pencil-square"></i> Sửa</a>
-                                    <a th:href="@{'/delete/' + ${product.id}}" class="btn btn-sm btn-outline-danger fw-semibold flex-grow-1 py-2 rounded-3" onclick="return confirm('Bạn chắc chắn có muốn xóa dòng máy này không?')"><i class="bi bi-trash3"></i> Xóa</a>
+                                    <a th:href="@{/edit/{id}(id=${product.id})}" class="btn btn-sm btn-outline-secondary fw-semibold flex-grow-1 py-2 rounded-3"><i class="bi bi-pencil-square"></i> Sửa</a>
+                                    <a th:href="@{/delete/{id}(id=${product.id})}" class="btn btn-sm btn-outline-danger fw-semibold flex-grow-1 py-2 rounded-3" onclick="return confirm('Bạn chắc chắn có muốn xóa dòng máy này không?')"><i class="bi bi-trash3"></i> Xóa</a>
                                 </div>
                                 
                                 <div sec:authorize="!hasRole('ADMIN')" class="w-100">
-                                    <a th:href="@{'/cart/add/' + ${product.id}}" 
+                                    <a th:href="@{/cart/add/{id}(id=${product.id})}" 
                                        class="btn btn-primary w-100 fw-bold py-2 rounded-3 shadow-sm"
                                        th:classappend="${product.quantity <= 0} ? 'disabled btn-secondary opacity-50' : ''">
                                         <i class="bi bi-bag-plus-fill me-1"></i> Mua Ngay
@@ -263,7 +263,7 @@
                     <ul class="pagination shadow-sm rounded-3">
                         <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${currentPage == i} ? 'active' : ''">
                             <a class="page-link page-link-custom py-2 px-3" 
-                               th:href="@{'/page/' + ${i}(keyword=${keyword}, sortDir=${sortDir}, categoryId=${categoryId})}" 
+                               th:href="@{/page/{pageNo}(pageNo=${i}, keyword=${keyword}, sortDir=${sortDir}, categoryId=${categoryId})}" 
                                th:text="${i}">1</a>
                         </li>
                     </ul>

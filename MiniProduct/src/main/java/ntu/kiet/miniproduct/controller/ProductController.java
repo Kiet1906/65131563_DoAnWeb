@@ -29,7 +29,6 @@ public class ProductController {
     private final ProductRepository repo;
     private final CategoryRepository categoryRepo;
 
-    // Tiêm (Inject) cả 2 Repository vào trong Controller để xử lý đồng thời Sản phẩm và Hãng
     public ProductController(ProductRepository repo, CategoryRepository categoryRepo) {
         this.repo = repo;
         this.categoryRepo = categoryRepo;
@@ -40,22 +39,15 @@ public class ProductController {
         return "login";
     }
 
-    /**
-     * TRANG CHỦ: Nhận từ khóa tìm kiếm (keyword), hướng sắp xếp (sortDir) và mã danh mục hãng (categoryId).
-     */
     @GetMapping("/")
     public String viewHomePage(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
             @RequestParam(value = "categoryId", required = false) Integer categoryId,
             Model model) {
-        // Chuyển hướng xử lý vào trang số 1
         return findPaginated(1, keyword, sortDir, categoryId, model);
     }
 
-    /**
-     * HÀM XỬ LÝ CHÍNH: Phân trang + Tìm kiếm mờ + Sắp xếp A-Z/Z-A + Lọc theo Hãng (Category)
-     */
     @GetMapping("/page/{pageNo}")
     public String findPaginated(
             @PathVariable int pageNo, 
@@ -64,15 +56,13 @@ public class ProductController {
             @RequestParam(value = "categoryId", required = false) Integer categoryId,
             Model model) {
         
-        int pageSize = 5; // Số sản phẩm trên 1 trang
+        int pageSize = 6; // Để hiển thị lưới 3 cột cho đẹp
 
-        // 1. Tạo quy tắc Sắp xếp: Nếu sortDir là "desc" thì xếp tên từ Z->A, ngược lại mặc định A->Z
-        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by("name").descending() : Sort.by("name").ascending();
+        // FIX LỖI 14: Đổi sắp xếp từ "name" sang "price"
+        Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by("price").descending() : Sort.by("price").ascending();
         
-        // 2. Gộp Trang hiện tại, Kích thước trang và Quy tắc sắp xếp thành 1 đối tượng Pageable
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
         
-        // Giữ nguyên thuật toán tạo chuỗi tìm kiếm mờ (Fuzzy Pattern) xuất sắc của bạn
         String finalPattern = "%";
         if (keyword != null && !keyword.trim().isEmpty()) {
             StringBuilder fuzzyPattern = new StringBuilder("%");
@@ -89,29 +79,22 @@ public class ProductController {
             model.addAttribute("keyword", "");
         }
 
-        // 3. Gọi hàm Repository mới: Lọc kết hợp cả Hãng điện thoại (CategoryId) và Tên tìm kiếm mờ
         Page<Product> page = repo.searchByCategoryAndNameFuzzy(categoryId, finalPattern, pageable);
-
-        // Lấy danh sách toàn bộ Hãng điện thoại để kết xuất ra thanh Menu bên trái giao diện
         List<Category> listCategories = categoryRepo.findAll();
 
-        // 4. Trả các dữ liệu hiển thị về giao diện HTML
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("totalItems", page.getTotalElements());
         model.addAttribute("listProducts", page.getContent());
         model.addAttribute("sortDir", sortDir); 
-        
-        // Đẩy thêm dữ liệu Hãng lên View phục vụ chức năng hiển thị và bôi đậm Menu
         model.addAttribute("listCategories", listCategories);
-        model.addAttribute("selectedCategoryId", categoryId);
+        
+        // FIX LỖI 13: Đổi từ selectedCategoryId sang categoryId cho khớp giao diện
+        model.addAttribute("categoryId", categoryId);
 
         return "index";
     }
 
-    /**
-     * Xử lý lưu sản phẩm (Thêm mới hoặc Cập nhật) và Upload Ảnh
-     */
     @PostMapping("/save")
     public String saveProduct(@ModelAttribute("product") Product product, 
                               @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
@@ -134,7 +117,6 @@ public class ProductController {
                 throw new IOException("Không thể lưu file ảnh: " + fileName, ioe);
             }
         } else {
-            // Cập nhật thông tin nhưng giữ nguyên ảnh cũ nếu không up ảnh mới
             if (product.getId() != null) {
                 Product existingProduct = repo.findById(product.getId()).orElse(null);
                 if (existingProduct != null) {
@@ -147,29 +129,21 @@ public class ProductController {
         return "redirect:/";
     }
 
-    /**
-     * ĐÃ CẬP NHẬT: Điều hướng mở biểu mẫu thêm mới sản phẩm trống kèm danh sách hãng lựa chọn.
-     */
     @GetMapping("/showNewProductForm")
     public String showNewProductForm(Model model) {
         Product product = new Product();
-        List<Category> listCategories = categoryRepo.findAll(); // Lấy list hãng điện thoại
-        
+        List<Category> listCategories = categoryRepo.findAll();
         model.addAttribute("product", product);
-        model.addAttribute("listCategories", listCategories); // Gửi sang form để nạp vào select dropdown
+        model.addAttribute("listCategories", listCategories);
         return "form";
     }
     
-    /**
-     * ĐÃ CẬP NHẬT: Tải thông tin sản phẩm hiện tại kèm danh sách hãng để thực hiện chỉnh sửa.
-     */
     @GetMapping("/edit/{id}")
     public String showEditProductForm(@PathVariable Integer id, Model model) {
         Product product = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Mã sản phẩm không hợp lệ: " + id));
-        List<Category> listCategories = categoryRepo.findAll(); // Lấy list hãng điện thoại
-        
+        List<Category> listCategories = categoryRepo.findAll();
         model.addAttribute("product", product);
-        model.addAttribute("listCategories", listCategories); // Gửi sang form để nạp vào select dropdown
+        model.addAttribute("listCategories", listCategories);
         return "form";
     }
     
