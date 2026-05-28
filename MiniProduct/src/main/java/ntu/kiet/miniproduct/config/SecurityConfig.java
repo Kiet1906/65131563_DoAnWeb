@@ -20,11 +20,11 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // 1. Cho phép TẤT CẢ mọi người (Khách & User) truy cập các trang công khai và tài nguyên tĩnh
-                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/product-images/**", "/page/**", "/cart/").permitAll()
+                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/product-images/**", "/page/**", "/cart/**").permitAll()
                 
-                // 2. CHỈ ADMIN (ROLE_ADMIN) mới có quyền truy cập các đường dẫn CRUD
-                // Spring Security tự động hiểu hasRole("ADMIN") là kiểm tra quyền "ROLE_ADMIN" trong DB
-                .requestMatchers("/showNewProductForm", "/save", "/edit/**", "/delete/**").hasRole("ADMIN")
+                // 2. CHỈ ADMIN (ROLE_ADMIN) mới có quyền truy cập các đường dẫn Quản trị và CRUD
+                // Đã bổ sung chặn đường dẫn "/admin/**"
+                .requestMatchers("/showNewProductForm", "/save", "/edit/**", "/delete/**", "/admin/**").hasRole("ADMIN")
                 
                 // 3. Các yêu cầu còn lại (nếu có) bắt buộc phải đăng nhập
                 .anyRequest().authenticated()

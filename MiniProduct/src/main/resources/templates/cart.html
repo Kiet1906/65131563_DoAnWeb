@@ -29,6 +29,16 @@
             border-radius: 8px;
             border: 1px solid #e2e8f0;
         }
+        .form-control-custom {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+        .form-control-custom:focus {
+            background-color: #ffffff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -128,12 +138,33 @@
                 </div>
                 
                 <form th:action="@{/cart/checkout}" method="post">
+                    
+                    <div th:if="${not #lists.isEmpty(cartItems)}" class="mb-4">
+                        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Thông tin giao hàng</h6>
+                        
+                        <div class="mb-2">
+                            <input type="text" name="fullname" class="form-control form-control-custom p-2" 
+                                   placeholder="Họ và tên người nhận" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="tel" name="phone" class="form-control form-control-custom p-2" 
+                                   placeholder="Số điện thoại liên hệ" pattern="[0-9]{9,11}" title="Vui lòng nhập đúng số điện thoại (9-11 số)" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea name="address" class="form-control form-control-custom p-2" 
+                                      rows="2" placeholder="Số nhà, Tên đường, Phường/Xã..." required></textarea>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100 fw-bold py-3 shadow fs-5"
                             th:disabled="${#lists.isEmpty(cartItems)}">
                         <i class="bi bi-bag-check-fill me-1"></i> XÁC NHẬN ĐẶT HÀNG
                     </button>
                 </form>
-                <small class="text-center d-block text-muted mt-3 italic"><i class="bi bi-shield-lock-fill text-success"></i> Đơn hàng kiểm tra kho an toàn tự động.</small>
+                
+                <small class="text-center d-block text-muted mt-3 fst-italic">
+                    <i class="bi bi-shield-lock-fill text-success"></i> Đơn hàng kiểm tra kho an toàn tự động.
+                </small>
             </div>
         </div>
     </div>

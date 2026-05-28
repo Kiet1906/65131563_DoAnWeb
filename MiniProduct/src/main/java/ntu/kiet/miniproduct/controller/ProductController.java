@@ -17,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ntu.kiet.miniproduct.entity.Category;
 import ntu.kiet.miniproduct.entity.Product;
@@ -147,9 +149,17 @@ public class ProductController {
         return "form";
     }
     
+    // Đã cập nhật lại hàm xóa để bắt lỗi khóa ngoại
     @GetMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable Integer id) {
-        repo.deleteById(id);
+    public String deleteProduct(@PathVariable Integer id, RedirectAttributes ra) {
+        try {
+            // Thử xóa sản phẩm
+            repo.deleteById(id);
+            ra.addFlashAttribute("message", "Xóa sản phẩm thành công!");
+        } catch (DataIntegrityViolationException e) {
+            // Bắt lỗi nếu sản phẩm đang dính khóa ngoại (đã có người mua)
+            ra.addFlashAttribute("error", "Lỗi: Không thể xóa sản phẩm này vì đã có khách hàng đặt mua. Vui lòng chỉnh 'Số lượng kho' về 0 thay vì xóa để bảo toàn lịch sử hóa đơn!");
+        }
         return "redirect:/";
     }
 }
