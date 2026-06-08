@@ -17,9 +17,7 @@
         }
     </style>
 </head>
-<body class="d-flex align-items-center min-vh-100">
-
-<div class="container">
+<body class="d-flex align-items-center min-vh-100 py-5"> <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="card register-card p-4 bg-white">
@@ -41,11 +39,35 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label class="form-label fw-semibold text-secondary">Mật khẩu</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
                             <input type="password" th:field="*{password}" class="form-control" placeholder="Nhập mật khẩu (từ 4 ký tự)..." required minlength="4">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary">Họ và tên đầy đủ</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-person-vcard"></i></span>
+                            <input type="text" th:field="*{fullname}" class="form-control" placeholder="Ví dụ: Nguyễn Văn A..." required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary">Số điện thoại</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-telephone"></i></span>
+                            <input type="tel" th:field="*{phone}" class="form-control" placeholder="Nhập số điện thoại liên lạc..." required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary">Địa chỉ mặc định</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" th:field="*{address}" class="form-control" placeholder="Số nhà, tên đường, xã/phường..." required>
                         </div>
                     </div>
 

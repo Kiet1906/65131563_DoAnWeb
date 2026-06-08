@@ -25,8 +25,8 @@ import java.util.Map;
 public class CartController {
 
     private final ProductRepository productRepo;
-    private final OrderRepository orderRepo; // Thêm Repo để lưu hóa đơn
-    private final UserRepository userRepo;   // Thêm Repo để lấy thông tin user đăng nhập
+    private final OrderRepository orderRepo; 
+    private final UserRepository userRepo;   
 
     // Inject các Repository
     public CartController(ProductRepository productRepo, OrderRepository orderRepo, UserRepository userRepo) {
@@ -68,7 +68,7 @@ public class CartController {
     }
 
     @GetMapping
-    public String viewCart(HttpSession session, Model model) {
+    public String viewCart(HttpSession session, Model model, Principal principal) {
         Map<Integer, CartItem> cart = (Map<Integer, CartItem>) session.getAttribute("cart");
         if (cart == null) {
             cart = new HashMap<>();
@@ -78,6 +78,16 @@ public class CartController {
 
         model.addAttribute("cartItems", cart.values());
         model.addAttribute("totalAmount", totalAmount);
+
+        // --- BỔ SUNG LOGIC: TỰ ĐỘNG LẤY THÔNG TIN ĐIỀN VÀO FORM ---
+        User customerInfo = new User(); // Tạo sẵn Object rỗng tránh lỗi form nếu khách chưa đăng nhập
+        if (principal != null) {
+            // Nếu đã đăng nhập, tìm thông tin từ DB đè lên
+            customerInfo = userRepo.findByUsername(principal.getName()).orElse(new User());
+        }
+        model.addAttribute("customerInfo", customerInfo);
+        // -----------------------------------------------------------
+
         return "cart"; 
     }
 
@@ -112,7 +122,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // 🔴 ĐÂY LÀ HÀM QUAN TRỌNG NHẤT ĐÃ ĐƯỢC CẬP NHẬT ĐỂ LƯU XUỐNG DB
     @PostMapping("/checkout")
     public String checkout(
             @RequestParam("fullname") String fullname,
@@ -169,7 +178,7 @@ public class CartController {
         newOrder.setOrderDetails(orderDetailsList);
         newOrder.setTotalPrice(totalPrice);
 
-        // Lưu toàn bộ (nhờ CascadeType.ALL trong entity Order, orderDetails sẽ tự động được lưu theo)
+        // Lưu toàn bộ 
         orderRepo.save(newOrder);
 
         // 4. Dọn dẹp session

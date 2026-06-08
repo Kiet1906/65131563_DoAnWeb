@@ -26,7 +26,8 @@ public class MiniProductApplication {
                 BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
                 String hashPassword = encoder.encode("123456");
                 
-                User admin = new User("admin", hashPassword, "ROLE_ADMIN");
+                // ĐÃ FIX LỖI ĐỎ: Bổ sung đủ 6 tham số (thêm fullname, phone, address cho Admin)
+                User admin = new User("admin", hashPassword, "ROLE_ADMIN", "Quản trị viên Hệ thống", "0999999999", "Trụ sở chính");
                 userRepo.save(admin);
                 System.out.println("==> Đã tạo tài khoản admin mẫu thành công trong Database!");
             }

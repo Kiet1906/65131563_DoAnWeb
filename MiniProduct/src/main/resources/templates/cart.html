@@ -144,15 +144,16 @@
                         
                         <div class="mb-2">
                             <input type="text" name="fullname" class="form-control form-control-custom p-2" 
-                                   placeholder="Họ và tên người nhận" required>
+                                   placeholder="Họ và tên người nhận" required th:value="${customerInfo.fullname}">
                         </div>
                         <div class="mb-2">
                             <input type="tel" name="phone" class="form-control form-control-custom p-2" 
-                                   placeholder="Số điện thoại liên hệ" pattern="[0-9]{9,11}" title="Vui lòng nhập đúng số điện thoại (9-11 số)" required>
+                                   placeholder="Số điện thoại liên hệ" pattern="[0-9]{9,11}" 
+                                   title="Vui lòng nhập đúng số điện thoại (9-11 số)" required th:value="${customerInfo.phone}">
                         </div>
                         <div class="mb-3">
                             <textarea name="address" class="form-control form-control-custom p-2" 
-                                      rows="2" placeholder="Số nhà, Tên đường, Phường/Xã..." required></textarea>
+                                      rows="2" placeholder="Số nhà, Tên đường, Phường/Xã..." required th:text="${customerInfo.address}"></textarea>
                         </div>
                     </div>
 
