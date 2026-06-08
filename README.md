@@ -18,7 +18,7 @@
 **PhoneStore** là một ứng dụng Web thương mại điện tử chuyên kinh doanh các thiết bị di động thông minh được xây dựng trên nền tảng Java Spring Boot. Dự án áp dụng chặt chẽ kiến trúc phân tầng MVC kết hợp với giải pháp quản lý dữ liệu tối ưu nhằm đem lại trải nghiệm mua sắm mượt mà cho khách hàng và hệ thống xử lý nghiệp vụ phê duyệt, hoàn kho an toàn cho Quản trị viên.
 
 ## 🎬 1. Video Demo Vận Hành
-👉 **[📺 BẤM VÀO ĐÂY ĐỂ XEM VIDEO DEMO DỰ ÁN PHONESTORE](https://www.youtube.com/)**
+👉 **[📺 BẤM VÀO ĐÂY ĐỂ XEM VIDEO DEMO DỰ ÁN PHONESTORE](https://youtu.be/A9G4l7xakRw)**
 
 ---
 
